@@ -21,8 +21,12 @@ import board
 import neopixel
 import time
 import math
-
-def ease_in(t, b, c, d):
+def ease_out(t, b, c, d):
+	t /= d
+	t = t - 1
+	return -c*(t*t*t*t - 1) + b
+    
+def ease_in_out(t, b, c, d):
 	t /= d/2.0
 	if t < 1:
 		return -c/2.0 * (math.sqrt(1 - t*t) - 1)
@@ -37,11 +41,24 @@ def action(pixels,color,atime):
         dt=time.time()-starttime
         if dt>ANIM_TIME:
             break
-        i=math.floor(ease_in(dt,0,len(pixels),atime))
+        i=math.floor(ease_in_out(dt,0,len(pixels),atime))
         pixels[i] = color
         pixels.fill((0,0,0))
 
-ANIM_TIME=0.7
+    starttime = time.time()
+    while 1==1:
+        dt=atime-(time.time()-starttime)
+        if dt<0:
+            break
+        i=math.floor(ease_out(dt,0,len(pixels),atime))
+        if(i>=len(pixels)):
+            i=len(pixels)-1
+        if(i<0):
+            i=0
+        pixels[i] = color
+        pixels.fill((0,0,0))
+
+ANIM_TIME=0.5
 LED_MAX_SIZE=8
 pixels = neopixel.NeoPixel(board.D18, LED_MAX_SIZE)
 pixels.fill((0,0,0))
