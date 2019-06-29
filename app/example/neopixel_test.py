@@ -12,24 +12,22 @@ def ease_in(t, b, c, d):
 	return c/2.0 * (math.sqrt(1 - t*t) + 1) + b
         
 
-def action():
-    LED_MAX_SIZE=20
-    LED_ONE_LINE_SIZE=8
-    LINE_SIZE=4
-    ANIM_TIME=0.9
-
-    pixels = neopixel.NeoPixel(board.D18, LED_MAX_SIZE)
-    pixels.fill((0,0,0))
-    pixels.show()
+def action(pixels,atime):
     starttime = time.time()
 
     while 1==1:
         dt=time.time()-starttime
         if dt>ANIM_TIME:
             break
-        i=math.floor(ease_in(dt,0,LED_MAX_SIZE,ANIM_TIME));
+        i=math.floor(ease_in(dt,0,len(pixels),atime))
         pixels[i] = (255, 0, 0)
         pixels.fill((0,0,0))
-    
 
-action()
+ANIM_TIME=0.9
+LED_MAX_SIZE=8
+pixels = neopixel.NeoPixel(board.D18, LED_MAX_SIZE)
+pixels.fill((0,0,0))
+pixels.show()
+
+while 1==1:
+    action(pixels,ANIM_TIME)
