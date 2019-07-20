@@ -5,35 +5,33 @@
 #define PC_READ   0x02
 #define PC_NOTIFY 0x10
 
-//初期化
-SoftwareSerial mySerial(PIN_MY_SERIAL_RX, PIN_MY_SERIAL_TX); // RX, TX
 
 void Initialize() {
-  mySerial.begin(115200);
+  Serial.begin(115200);
   /**************************************************************
     子機：ペリフェラル
   **************************************************************/
   //出荷時設定
-  mySerial.println("SF,1");
+  Serial.println("SF,1");
   //ボーレート設定
-  mySerial.println("SB,1");
+  Serial.println("SB,1");
   //Private Serviceリセット
-  mySerial.println("PZ");
+  Serial.println("PZ");
   //Reboot
-  mySerial.println("R,1");
+  Serial.println("R,1");
   //ソフトウェアシリアル変更
-  mySerial.end();
-  mySerial.begin(9600);
+  Serial.end();
+  Serial.begin(9600);
   //エコー
-  mySerial.println("+");
+  Serial.println("+");
   //Device Name
-  mySerial.println("SDM,Arduino_nano");
+  Serial.println("SDM,Arduino_nano");
   /**************************************************************
     SS:サービス設定
     SetRegister
     0x00000001 : User
   **************************************************************/
-  mySerial.println("SS,00000001");
+  Serial.println("SS,00000001");
   /*カスタムPriveteService立ち上げ*/
   Register_Private_Service(FINSNAP_SERVICE_UUID);
   /*カスタムPriveteCharacteristic設定*/
@@ -46,13 +44,13 @@ void Initialize() {
     0x04000000 : No Direct Advertisement
     0x02000000 : UART Flow
   **************************************************************/
-  mySerial.println("SR,36000000");
+  Serial.println("SR,36000000");
 
   //Reboot
-  mySerial.println("R,1");
+  Serial.println("R,1");
   delay(500);
 
-  if (mySerial.available()) {
+  if (Serial.available()) {
     PORTB |= _BV(5);
   }
 
@@ -65,15 +63,15 @@ void Check_CMD() {
   int i  = 0;
   String buff;
   while (1) {
-    if (mySerial.available()) {
-      buff = mySerial.readString();
+    if (Serial.available()) {
+      buff = Serial.readString();
     }
     if ((buff.indexOf("CMD") >= 63) || (buff.indexOf("CMD") == 0)) {
       i = 0;
       break;
     }
     if (i >= 1000) {
-      mySerial.println("R,1");
+      Serial.println("R,1");
       i = 0;
     }
     i++;
@@ -85,7 +83,7 @@ void Check_CMD() {
 void Register_Private_Service(String uuid) {
   String cmd = "PS,";
   cmd.concat(uuid);
-  mySerial.println(cmd);
+  Serial.println(cmd);
 }
 
 //PC登録
@@ -94,14 +92,14 @@ void Register_Private_Characteristic(String uuid, int property, int bytes) {
   char cmd[255] = "";
   uuid.toCharArray(uuid_char, uuid.length() + 1);
   sprintf(cmd, "PC,%s,%02x,%02x", uuid_char, property, bytes);
-  mySerial.println(cmd);
+  Serial.println(cmd);
 }
 
 int getBLEAccess(){
     String RD;
-  if (mySerial.available()) {
+  if (Serial.available()) {
     PORTB |= _BV(5);
-    RD = mySerial.readString();
+    RD = Serial.readString();
     /*BT CMD Check*/
     if (RD.indexOf("WV") != -1) {
       String BTwdata = RD.substring(8, 10);

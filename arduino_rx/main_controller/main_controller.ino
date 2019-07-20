@@ -1,13 +1,9 @@
 #include "RN4020.h"
 #include "key_settings.h"
 void setup() {
-  Serial.begin(115200); // ハードウェアシリアルを準備
   pinMode(PIN_TEST_LED, OUTPUT);
   pinMode(PIN_IN1, OUTPUT);
   pinMode(PIN_IN2, OUTPUT);
-  Serial.println("/*****Arduino UNO*****/");
-  Serial.println("/      Peripheral     /");
-  Serial.println("/   BLE Setting now   /");
   Initialize();
   // 回転速度調整
   analogWrite(PIN_VREF, 127);
