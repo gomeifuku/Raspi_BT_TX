@@ -51,11 +51,11 @@ void Initialize() {
   delay(500);
 
   if (Serial.available()) {
-    PORTB |= _BV(5);
+//    PORTB |= _BV(5);
   }
 
   Check_CMD();
-  PORTB &= ~_BV(5);
+//  PORTB &= ~_BV(5);
 }
 
 //RN4020 コマンド受付チェック
@@ -94,9 +94,9 @@ void Register_Private_Characteristic(String uuid, int property, int bytes) {
   sprintf(cmd, "PC,%s,%02x,%02x", uuid_char, property, bytes);
   Serial.println(cmd);
 }
-
+/*outout:1=success,-1=error,0=non*/
 int getBLEAccess(){
-    String RD;
+  String RD;
   if (Serial.available()) {
     PORTB |= _BV(5);
     RD = Serial.readString();
@@ -104,13 +104,15 @@ int getBLEAccess(){
     if (RD.indexOf("WV") != -1) {
       String BTwdata = RD.substring(8, 10);
       if (BTwdata.toInt() == 1) {
+        PORTB &= ~_BV(5);
         return 1;
       } else {
+         PORTB &= ~_BV(5);
         return 0;
       }
     }
-    return -1;
     PORTB &= ~_BV(5);
+    return -1;
   }
+  return 0;
 }
-

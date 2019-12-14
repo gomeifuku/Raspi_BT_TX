@@ -38,7 +38,7 @@ def action(pixels,color,atime):
 
     while 1==1:
         dt=time.time()-starttime
-        if dt>ANIM_TIME:
+        if dt>atime:
             break
         i=math.floor(ease_in_out(dt,0,len(pixels),atime))
         pixels[i] = color
@@ -66,21 +66,18 @@ def main():
     pixels = neopixel.NeoPixel(board.D18, LED_MAX_SIZE)
     pixels.fill((0,0,0))
     pixels.show()
-    bd = ble.BLE_Manager()
-    
-    def clapping():
-        action(pixels,(0,0,255),ANIM_TIME)
-        global isLeft
-        if isLeft is True:
-            bd.sendCWRotation()
-        else:
-            bd.sendACWRotation()
-        isLeft=~isLeft
-
     action(pixels,(255,0,0),ANIM_TIME)
     action(pixels,(0,255,0),ANIM_TIME)
     action(pixels,(0,0,255),ANIM_TIME)
+    try:
+        bd = ble.BLE_Manager()
+    except BTLEDisconnectError as e:
+        print("NotFoundBLEDevice")
     
+    def clapping():
+        action(pixels,(0,0,255),ANIM_TIME)
+        bd.sendTriggerRotation()
+
     clap = Button(4)
     clap.when_pressed = clapping
     pause()
